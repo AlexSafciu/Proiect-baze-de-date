@@ -1,0 +1,65 @@
+View pentru Lista Comenzilor:
+CREATE VIEW ListaComenzi AS
+SELECT Comenzi.ID_Comanda, Utilizatori.Nume, Utilizatori.Prenume, Comenzi.Status_Comanda
+FROM Comenzi
+JOIN Utilizatori ON Comenzi.ID_Utilizator = Utilizatori.ID_Utilizator;
+
+SELECT * FROM ListaComenzi;--PERMISA
+
+UPDATE ListaComenzi
+SET Status_Comanda = 'Finalizată'--NEPERMISA
+WHERE ID_Comanda = 1;
+
+
+View pentru Produsele în Stoc:
+CREATE VIEW ProduseInStoc AS
+SELECT Nume_Produs, Stoc_Disponibil
+FROM InformatiiProduse
+WHERE Stoc_Disponibil > 0;
+
+UPDATE ProduseInStoc
+SET Stoc_Disponibil = Stoc_Disponibil - 1 --PERMISA
+WHERE Nume_Produs = 'Laptop';
+
+
+INSERT INTO ProduseInStoc (Nume_Produs, Stoc_Disponibil) --NEPERMISA
+VALUES ('Cameră Foto', 5);
+
+View pentru Detaliile Recenziilor:
+CREATE VIEW DetaliiRecenziiComenzi AS
+SELECT
+    DC.ID_DetaliiComanda,
+    C.ID_Comanda,
+    C.ID_Utilizator,
+    U.Nume AS Nume_Utilizator,
+    U.Prenume AS Prenume_Utilizator,
+    C.Status_Comanda,
+    C.Data_Ora_Livrarii,
+    C.Total_Comanda,
+    RP.ID_Recenzie,
+    RP.Comentariu,
+    RP.Nota_Acordata
+FROM
+    DetaliiComanda DC
+JOIN Comenzi C ON DC.ID_Comanda = C.ID_Comanda
+JOIN RecenziiProduse RP ON C.ID_Utilizator = RP.ID_Utilizator
+JOIN Utilizatori U ON C.ID_Utilizator = U.ID_Utilizator;
+
+
+-- Exemplu de interogare pe vedere
+SELECT * FROM DetaliiRecenziiComenzi;
+
+
+-- Exemplu de încercare de actualizare a vederii (nepermis)
+UPDATE DetaliiRecenziiComenzi
+SET Status_Comanda = 'Finalizată'
+WHERE ID_Comanda = 1;
+
+-- Exemplu de încercare de inserare în vedere (nepermis)
+INSERT INTO DetaliiRecenziiComenzi (ID_Comanda, Status_Comanda)
+VALUES (6, 'Noua Comanda');
+
+-- Exemplu de încercare de ștergere din vedere (nepermis)
+DELETE FROM DetaliiRecenziiComenzi
+WHERE ID_Comanda = 2;
+
