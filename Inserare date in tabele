@@ -1,0 +1,55 @@
+INSERT INTO Utilizatori (Nume, Prenume, Adresa_Email, Parola)
+VALUES
+  ('Safciu', 'Alex', 'alexradusaf@gmail.com', 'parola123'),
+  ('Parker', 'Peter', 'peter.parker@gmail.com', 'parola456'),
+  ('Prime', 'Optimus', 'optimus.prime@yahoo.com', 'parola789'),
+  ('Taylor', 'Emily', 'emily.taylor@yahoo.com', 'parolaabc'),
+  ('Anderson', 'Michael', 'michael.anderson@gmail.com', 'parolaxyz');
+
+INSERT INTO AdreseLivrare (Oras, Tara, Cod_Postal, Adresa_Livrare)
+VALUES
+  ('Craiova', 'Romania', '900101', 'Bulevardul Carol, Nr. 7, Bl D3, ap 12'),
+  ('Bucuresti', 'Romania', '010101', 'Strada Florilor, Nr. 1'),
+  ('Cluj-Napoca', 'Romania', '400001', 'Bulevardul Principal, Nr. 10, Bl Y, ap 1'),
+  ('Timisoara', 'Romania', '300101', 'Aleea Paradisului, Nr. 5, Bl a12, ap 51'),
+  ('Iasi', 'Romania', '700501', 'Piata Independentei, Nr. 2');
+
+INSERT INTO RecenziiProduse (ID_Utilizator, ID_Produs, Comentariu, Nota_Acordata)
+VALUES
+  (1, 1, 'Produs excelent, sunt foarte mulțumit!', 5),
+  (2, 2, 'Calitatea produsului lasă de dorit.', 2),
+  (4, 3, 'Recomand cu căldură acest produs!', 4),
+  (3, 4, 'Nu funcționează așa cum mă așteptam.', 3),
+  (5, 5, 'Design modern și performanță remarcabilă!', 5);
+
+INSERT INTO Comenzi (ID_Utilizator, Status_Comanda, Data_Ora_Livrarii, Total_Comanda)
+VALUES
+  (1, 'In procesare', '2024-01-17 12:30:00', 250.00),
+  (3, 'Expediată', '2024-01-18 09:45:00', 120.50),
+  (2, 'Livrată', '2024-01-19 15:20:00', 350.75),
+  (4, 'In procesare', '2024-01-20 10:10:00', 80.90),
+  (5, 'Expediată', '2024-01-21 14:00:00', 420.25);
+
+INSERT INTO DetaliiComanda (ID_Comanda, Cantitate, Pret_Unitar, Subtotal)
+VALUES
+  (1, 2, 125.00, 250.00),
+  (3, 5, 24.10, 120.50),
+  (2, 1, 350.75, 350.75),
+  (4, 3, 26.97, 80.90),
+  (5, 2, 210.12, 420.25);
+
+INSERT INTO Produse (ID_Comanda, Nume_Produs, Descriere, Pret, Stoc_Disponibil)
+VALUES
+  (1, 'Laptop', 'Laptop performant pentru utilizare zilnica', 4200.00, 50),
+  (2, 'Telefon', 'Telefon inteligent cu cameră de înaltă rezoluție', 550.00, 30),
+  (3, 'Mouse', 'Mouse optic ergonomic pentru gaming', 48.20, 100),
+  (4, 'Căști Wireless', 'Căști Bluetooth cu sunet de calitate', 26.97, 80),
+  (5, 'Monitor', 'Monitor LED cu rezoluție Full HD', 210.12, 45);
+
+INSERT INTO CategoriiProduse (ID_Produs, Descriere_Categorie, Nume_Categorie)
+VALUES
+  (1, 'Electronice', 'Laptopuri'),
+  (2, 'Electronice', 'Telefoane'),
+  (3, 'Periferice', 'Mouse-uri'),
+  (4, 'Accesorii', 'Căști'),
+  (5, 'Electronice', 'Monitoare');
