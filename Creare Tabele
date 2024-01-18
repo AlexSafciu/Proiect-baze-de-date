@@ -1,0 +1,69 @@
+CREATE TABLE Utilizatori (
+    ID_Utilizator SERIAL PRIMARY KEY,
+    Nume VARCHAR(50) NOT NULL,
+    Prenume VARCHAR(50) NOT NULL,
+    Adresa_Email VARCHAR(100) UNIQUE NOT NULL,
+    Parola VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE AdreseLivrare (
+    ID_AdresaLivrare SERIAL PRIMARY KEY,
+    Oras VARCHAR(50) NOT NULL,
+    Tara VARCHAR(50) NOT NULL,
+    Cod_Postal VARCHAR(20),
+    Adresa_Livrare TEXT NOT NULL
+);
+
+CREATE TABLE UtilizatoriAdresa (
+    ID_Utilizator INT,
+    ID_AdresaLivrare INT,
+    PRIMARY KEY (ID_Utilizator, ID_AdresaLivrare),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator),
+    FOREIGN KEY (ID_AdresaLivrare) REFERENCES AdreseLivrare(ID_AdresaLivrare)
+);
+
+CREATE TABLE RecenziiProduse (
+    ID_Recenzie SERIAL PRIMARY KEY,
+    ID_Utilizator INT,
+    ID_Produs INT,
+    Comentariu TEXT,
+    Nota_Acordata INT CHECK (Nota_Acordata >= 1 AND Nota_Acordata <= 5),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator)
+);
+
+CREATE TABLE Comenzi (
+    ID_Comanda SERIAL PRIMARY KEY,
+    ID_Utilizator INT,
+    Status_Comanda VARCHAR(50),
+    Data_Ora_Livrarii TIMESTAMP,
+    Total_Comanda DECIMAL(10, 2),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator)
+);
+
+CREATE TABLE DetaliiComanda (
+    ID_DetaliiComanda SERIAL PRIMARY KEY,
+    ID_Comanda INT,
+    Cantitate INT,
+    Pret_Unitar DECIMAL(10, 2),
+    Subtotal DECIMAL(10, 2),
+    FOREIGN KEY (ID_Comanda) REFERENCES Comenzi(ID_Comanda)
+);
+
+CREATE TABLE Produse (
+    ID_Produs SERIAL PRIMARY KEY,
+    ID_Comanda INT,
+    Pret DECIMAL(10, 2),
+    Nume_Produs VARCHAR(100) NOT NULL,
+    Descriere TEXT,
+    Stoc_Disponibil INT,
+    FOREIGN KEY (ID_Comanda) REFERENCES Comenzi(ID_Comanda)
+);
+
+CREATE TABLE CategoriiProduse (
+    ID_Categorie SERIAL PRIMARY KEY,
+    ID_Produs INT,
+    Descriere_Categorie TEXT,
+    Nume_Categorie VARCHAR(50) NOT NULL,
+    FOREIGN KEY (ID_Produs) REFERENCES Produse(ID_Produs)
+);
+
