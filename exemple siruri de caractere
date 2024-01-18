@@ -1,0 +1,8 @@
+Exemplu de concatenare a numelui și prenumelui utilizatorilor:
+SELECT Nume || ' ' || Prenume AS Nume_Complet
+FROM Utilizatori;
+
+
+Exemplu de extragere a primei litere din numele produselor:
+SELECT Nume_Produs, SUBSTRING(Nume_Produs FROM 1 FOR 1) AS Prima_Litera
+FROM InformatiiProduse;
