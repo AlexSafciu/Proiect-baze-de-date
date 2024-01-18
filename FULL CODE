@@ -1,0 +1,547 @@
+--Utilizator:
+--ID_Utilizator
+--Nume
+--Prenume
+--Adresa de e-mail
+--Parola
+
+CREATE TABLE Utilizatori (
+    ID_Utilizator SERIAL PRIMARY KEY,
+    Nume VARCHAR(50) NOT NULL,
+    Prenume VARCHAR(50) NOT NULL,
+    Adresa_Email VARCHAR(100) UNIQUE NOT NULL,
+    Parola VARCHAR(255) NOT NULL
+);
+
+
+--Adresa de livrare:
+--ID_AdresaLivrare
+--Oras
+--Tara
+--Cod Postal
+--Adresa de livrare
+
+CREATE TABLE AdreseLivrare (
+    ID_AdresaLivrare SERIAL PRIMARY KEY,
+    Oras VARCHAR(50) NOT NULL,
+    Tara VARCHAR(50) NOT NULL,
+    Cod_Postal VARCHAR(20),
+    Adresa_Livrare TEXT NOT NULL
+);
+
+CREATE TABLE UtilizatoriAdresa (
+    ID_Utilizator INT,
+    ID_AdresaLivrare INT,
+    PRIMARY KEY (ID_Utilizator, ID_AdresaLivrare),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator),
+    FOREIGN KEY (ID_AdresaLivrare) REFERENCES AdreseLivrare(ID_AdresaLivrare)
+);
+
+
+--Recenzii produse:
+--ID_Recenzie
+--ID_Utilizator
+--ID_Produs
+--Comentariu
+--Nota acordata
+
+CREATE TABLE RecenziiProduse (
+    ID_Recenzie SERIAL PRIMARY KEY,
+    ID_Utilizator INT,
+    ID_Produs INT,
+    Comentariu TEXT,
+    Nota_Acordata INT CHECK (Nota_Acordata >= 1 AND Nota_Acordata <= 5),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator)
+);
+
+
+--Comenzi:
+--ID_Comanda
+--ID_Utilizator
+--Status comanda
+--Data si ora livrarii
+--Total comanda
+
+CREATE TABLE Comenzi (
+    ID_Comanda SERIAL PRIMARY KEY,
+    ID_Utilizator INT,
+    Status_Comanda VARCHAR(50),
+    Data_Ora_Livrarii TIMESTAMP,
+    Total_Comanda DECIMAL(10, 2),
+    FOREIGN KEY (ID_Utilizator) REFERENCES Utilizatori(ID_Utilizator)
+);
+
+
+--Detalii comanda:
+--ID_DetaliiComanda
+--ID_Comanda
+--Cantitate
+--Pret unitar
+--Subtotal pentru produse
+
+CREATE TABLE DetaliiComanda (
+    ID_DetaliiComanda SERIAL PRIMARY KEY,
+    ID_Comanda INT,
+    Cantitate INT,
+    Pret_Unitar DECIMAL(10, 2),
+    Subtotal DECIMAL(10, 2),
+    FOREIGN KEY (ID_Comanda) REFERENCES Comenzi(ID_Comanda)
+);
+
+--Produse:
+--ID_Produs
+--ID_Comanda
+--Pret
+--Nume produs
+--Descriere
+--Stoc disponibil
+
+CREATE TABLE Produse (
+    ID_Produs SERIAL PRIMARY KEY,
+    ID_Comanda INT,
+    Pret DECIMAL(10, 2),
+    Nume_Produs VARCHAR(100) NOT NULL,
+    Descriere TEXT,
+    Stoc_Disponibil INT,
+    FOREIGN KEY (ID_Comanda) REFERENCES Comenzi(ID_Comanda)
+);
+
+
+--Categorii de produse:
+--ID_Categorie
+--ID_Produs
+--Descriere categorie
+--Nume categorie
+
+CREATE TABLE CategoriiProduse (
+    ID_Categorie SERIAL PRIMARY KEY,
+    ID_Produs INT,
+    Descriere_Categorie TEXT,
+    Nume_Categorie VARCHAR(50) NOT NULL,
+    FOREIGN KEY (ID_Produs) REFERENCES Produse(ID_Produs)
+);
+
+--INTRODUCERE DATE
+
+INSERT INTO Utilizatori (Nume, Prenume, Adresa_Email, Parola)
+VALUES
+  ('Safciu', 'Alex', 'alexradusaf@gmail.com', 'parola123'),
+  ('Parker', 'Peter', 'peter.parker@gmail.com', 'parola456'),
+  ('Prime', 'Optimus', 'optimus.prime@yahoo.com', 'parola789'),
+  ('Taylor', 'Emily', 'emily.taylor@yahoo.com', 'parolaabc'),
+  ('Anderson', 'Michael', 'michael.anderson@gmail.com', 'parolaxyz');
+
+INSERT INTO AdreseLivrare (Oras, Tara, Cod_Postal, Adresa_Livrare)
+VALUES
+  ('Craiova', 'Romania', '900101', 'Bulevardul Carol, Nr. 7, Bl D3, ap 12'),
+  ('Bucuresti', 'Romania', '010101', 'Strada Florilor, Nr. 1'),
+  ('Cluj-Napoca', 'Romania', '400001', 'Bulevardul Principal, Nr. 10, Bl Y, ap 1'),
+  ('Timisoara', 'Romania', '300101', 'Aleea Paradisului, Nr. 5, Bl a12, ap 51'),
+  ('Iasi', 'Romania', '700501', 'Piata Independentei, Nr. 2');
+
+INSERT INTO RecenziiProduse (ID_Utilizator, ID_Produs, Comentariu, Nota_Acordata)
+VALUES
+  (1, 1, 'Produs excelent, sunt foarte mulțumit!', 5),
+  (2, 2, 'Calitatea produsului lasă de dorit.', 2),
+  (4, 3, 'Recomand cu căldură acest produs!', 4),
+  (3, 4, 'Nu funcționează așa cum mă așteptam.', 3),
+  (5, 5, 'Design modern și performanță remarcabilă!', 5);
+
+INSERT INTO Comenzi (ID_Utilizator, Status_Comanda, Data_Ora_Livrarii, Total_Comanda)
+VALUES
+  (1, 'In procesare', '2024-01-17 12:30:00', 250.00),
+  (3, 'Expediată', '2024-01-18 09:45:00', 120.50),
+  (2, 'Livrată', '2024-01-19 15:20:00', 350.75),
+  (4, 'In procesare', '2024-01-20 10:10:00', 80.90),
+  (5, 'Expediată', '2024-01-21 14:00:00', 420.25);
+
+INSERT INTO DetaliiComanda (ID_Comanda, Cantitate, Pret_Unitar, Subtotal)
+VALUES
+  (1, 2, 125.00, 250.00),
+  (3, 5, 24.10, 120.50),
+  (2, 1, 350.75, 350.75),
+  (4, 3, 26.97, 80.90),
+  (5, 2, 210.12, 420.25);
+
+INSERT INTO Produse (ID_Comanda, Nume_Produs, Descriere, Pret, Stoc_Disponibil)
+VALUES
+  (1, 'Laptop', 'Laptop performant pentru utilizare zilnica', 4200.00, 50),
+  (2, 'Telefon', 'Telefon inteligent cu cameră de înaltă rezoluție', 550.00, 30),
+  (3, 'Mouse', 'Mouse optic ergonomic pentru gaming', 48.20, 100),
+  (4, 'Căști Wireless', 'Căști Bluetooth cu sunet de calitate', 26.97, 80),
+  (5, 'Monitor', 'Monitor LED cu rezoluție Full HD', 210.12, 45);
+
+INSERT INTO CategoriiProduse (ID_Produs, Descriere_Categorie, Nume_Categorie)
+VALUES
+  (1, 'Electronice', 'Laptopuri'),
+  (2, 'Electronice', 'Telefoane'),
+  (3, 'Periferice', 'Mouse-uri'),
+  (4, 'Accesorii', 'Căști'),
+  (5, 'Electronice', 'Monitoare');
+
+-- Afișează conținutul tabelei "Utilizatori"
+--SELECT * FROM Utilizatori
+
+-- Afișează conținutul tabelei "AdreseLivrare"
+--SELECT * FROM AdreseLivrare
+
+-- Afișează conținutul tabelei "UtilizatoriAdresa"
+--SELECT * FROM UtilizatoriAdresa
+
+-- Afișează conținutul tabelei "RecenziiProduse"
+--SELECT * FROM RecenziiProduse
+
+-- Afișează conținutul tabelei "Comenzi"
+--SELECT * FROM Comenzi
+
+-- Afișează conținutul tabelei "DetaliiComanda"
+--SELECT * FROM DetaliiComanda
+
+-- Afișează conținutul tabelei "Produse"
+--SELECT * FROM Produse
+
+-- Afișează conținutul tabelei "InformatiiProduse"
+--SELECT * FROM InformatiiProduse
+
+-- Afișează conținutul tabelei "CategoriiProduse"
+--SELECT * FROM CategoriiProduse
+--ORDER BY id_;
+
+
+UPDATE Utilizatori
+SET Prenume = 'Radu'
+WHERE ID_Utilizator = 1;
+
+UPDATE Produse
+SET Stoc_Disponibil = Stoc_Disponibil + 10
+WHERE ID_Produs = 2;
+
+DELETE FROM RecenziiProduse
+WHERE ID_Recenzie = 3;
+
+--Actualizare - Actualizarea statusului comenzii la 'Finalizată' pentru un utilizator anume:
+UPDATE Comenzi
+SET Status_Comanda = 'Finalizată'
+WHERE ID_Utilizator = (SELECT ID_Utilizator FROM Utilizatori WHERE Nume = 'Safciu' AND Prenume = 'Radu');
+
+
+--Actualizare - Actualizarea prețului produselor cu o anumită categorie:
+UPDATE Produse
+SET Pret = Pret * 1.1
+WHERE ID_Produs IN (SELECT ID_Produs FROM CategoriiProduse WHERE Nume_Categorie = 'Laptopuri');
+
+
+--Ștergere - Ștergerea tuturor recenziilor asociate produselor cu stoc disponibil mai mic de 49:
+DELETE FROM RecenziiProduse
+WHERE ID_Produs IN (SELECT ID_Produs FROM Produse WHERE Stoc_Disponibil < 49);
+
+FORMA NORMALA 2NF:
+
+--Creează o nouă tabelă pentru informații despre produse:
+CREATE TABLE InformatiiProduse (
+    ID_Produs SERIAL PRIMARY KEY,
+    Nume_Produs VARCHAR(100) NOT NULL,
+    Descriere TEXT,
+    Stoc_Disponibil INT
+);
+
+--Actualizează tabela Produse pentru a include doar cheile primare necesare și adaugă o cheie străină către InformatiiProduse:
+ALTER TABLE Produse
+ADD COLUMN ID_InfoProdus INT,
+ADD FOREIGN KEY (ID_InfoProdus) REFERENCES InformatiiProduse(ID_Produs);
+
+--Transferă datele relevante din Produse la InformatiiProduse:
+INSERT INTO InformatiiProduse (ID_Produs, Nume_Produs, Descriere, Stoc_Disponibil)
+SELECT ID_Produs, Nume_Produs, Descriere, Stoc_Disponibil
+FROM Produse;
+
+--Elimină coloanele redundante din Produse:
+ALTER TABLE Produse
+DROP COLUMN Nume_Produs,
+DROP COLUMN Descriere,
+DROP COLUMN Stoc_Disponibil;
+
+--Cu aceste modificări, am separat informațiile despre produse într-o nouă tabelă InformatiiProduse, iar tabela Produse conține acum doar cheile străine necesare. Astfel, baza de date ar trebui să respecte a doua formă normală (2NF).
+
+
+--Inner Join - Obține informații despre produsele dintr-o comandă:
+SELECT DetaliiComanda.ID_Comanda, DetaliiComanda.Cantitate, InformatiiProduse.Nume_Produs
+FROM DetaliiComanda
+INNER JOIN InformatiiProduse ON DetaliiComanda.ID_Comanda = InformatiiProduse.ID_Produs;
+
+
+--Left Outer Join - Afișează toate adresele de livrare și utilizatorii asociați (chiar și cei fără adrese de livrare):
+SELECT Utilizatori.Nume, Utilizatori.Prenume, AdreseLivrare.Oras
+FROM Utilizatori
+LEFT OUTER JOIN UtilizatoriAdresa ON Utilizatori.ID_Utilizator = UtilizatoriAdresa.ID_Utilizator
+LEFT OUTER JOIN AdreseLivrare ON UtilizatoriAdresa.ID_AdresaLivrare = AdreseLivrare.ID_AdresaLivrare;
+
+
+--Inner Join - Obține recenziile și numele utilizatorilor care le-au scris, împreună cu informații despre produse:
+SELECT RecenziiProduse.Comentariu, RecenziiProduse.Nota_Acordata, Utilizatori.Nume, Utilizatori.Prenume, InformatiiProduse.Nume_Produs
+FROM RecenziiProduse
+INNER JOIN Utilizatori ON RecenziiProduse.ID_Utilizator = Utilizatori.ID_Utilizator
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs;
+
+
+--Right Outer Join - Afișează toate categoriile de produse și produsele asociate (chiar și cele fără categorii), împreună cu informații despre produse:
+SELECT CategoriiProduse.Nume_Categorie, InformatiiProduse.Nume_Produs
+FROM CategoriiProduse
+RIGHT OUTER JOIN InformatiiProduse ON CategoriiProduse.ID_Produs = InformatiiProduse.ID_Produs;
+
+--Afișează suma totală a comenzilor pentru fiecare utilizator:
+--(am adaugat inca o comanda la id utiliz 4)
+SELECT RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs, AVG(RecenziiProduse.Nota_Acordata) AS MedieNota
+FROM RecenziiProduse
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs
+GROUP BY RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs;
+
+--Afișează media notelor acordate în recenzii pentru fiecare produs:
+SELECT RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs, AVG(RecenziiProduse.Nota_Acordata) AS MedieNota
+FROM RecenziiProduse
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs
+GROUP BY RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs;
+
+
+
+--Afișează cantitatea totală de produse comandate pentru fiecare categorie:
+SELECT CategoriiProduse.Nume_Categorie, SUM(DetaliiComanda.Cantitate) AS CantitateTotala
+FROM CategoriiProduse
+INNER JOIN Produse ON CategoriiProduse.ID_Produs = Produse.ID_Produs
+INNER JOIN DetaliiComanda ON Produse.ID_Comanda = DetaliiComanda.ID_Comanda
+GROUP BY CategoriiProduse.Nume_Categorie;
+
+--CORELATE:
+--Exemplu cu IN:
+--Această subinterogare verifică utilizatorii care au comenzi finalizate.
+SELECT Nume, Prenume
+FROM Utilizatori
+WHERE ID_Utilizator IN (SELECT ID_Utilizator FROM Comenzi WHERE Status_Comanda = 'Finalizată');
+
+
+--Exemplu cu ANY:
+--Această subinterogare returnează categoriile produselor cu un preț mai mare de 1000.
+--Această interogare returnează numele și prenumele utilizatorilor care au plasat comenzi cu o cantitate mai mare de 2 pentru orice produs, implicând astfel cele trei tabele menționate.
+SELECT Nume, Prenume
+FROM Utilizatori
+WHERE ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM Comenzi
+    WHERE ID_Comanda IN (
+        SELECT ID_Comanda
+        FROM DetaliiComanda
+        WHERE Cantitate > 2
+    )
+);
+
+--Eemplu cu EXISTS:
+--Această interogare returnează numele și prenumele utilizatorilor care au comenzi cu o cantitate mai mare de 2 pentru oricare dintre produsele comandate, implicând cele trei tabele menționate.
+SELECT Nume, Prenume
+FROM Utilizatori U
+WHERE EXISTS (
+    SELECT 1
+    FROM Comenzi C
+    WHERE EXISTS (
+        SELECT 1
+        FROM DetaliiComanda DC
+        WHERE DC.ID_Comanda = C.ID_Comanda
+        AND DC.Cantitate > 2
+    )
+    AND C.ID_Utilizator = U.ID_Utilizator
+);
+
+
+--Exemplu cu ALL:
+--Această interogare verifică dacă utilizatorul are toate comenzile finalizate cu un total mai mare de 200 și, în același timp, are toate detaliile comenzilor cu o cantitate mai mare de 1.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM Comenzi
+    WHERE Status_Comanda = 'Finalizată' AND Total_Comanda > 200
+          AND ID_Utilizator = ALL (
+              SELECT ID_Utilizator
+              FROM DetaliiComanda
+              WHERE Cantitate > 1
+          )
+);
+
+
+--NECORELARE:
+--IN:
+--Se selectează numele utilizatorilor care au plasat comenzi și au lăsat recenzii la produse.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM Comenzi
+) AND ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM RecenziiProduse
+);
+
+
+
+--ANY:
+--Se selectează numele categoriilor de produse care au cel puțin un produs cu un stoc disponibil mai mare de 10 unități.
+SELECT Nume_Categorie
+FROM CategoriiProduse
+WHERE ID_Produs = ANY (
+    SELECT ID_Produs
+    FROM InformatiiProduse
+    WHERE Stoc_Disponibil > 10
+);
+
+
+--EXISTS:
+--e selectează numele produselor care fac parte din categoria "Electronice" și nu au fost comandate în cantități mai mari de 5.
+SELECT Nume_Produs
+FROM InformatiiProduse
+WHERE EXISTS (
+    SELECT 1
+    FROM CategoriiProduse
+    WHERE Descriere_Categorie LIKE 'Electronice%'
+) AND NOT EXISTS (
+    SELECT 1
+    FROM DetaliiComanda
+    WHERE ID_Produs = InformatiiProduse.ID_Produs AND Cantitate > 5
+);
+
+--ALL:
+--Se selectează numele utilizatorilor care au plasat toate comenzile finalizate și au dat note mai mari de 3 în toate recenziile lor.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM Comenzi
+    WHERE Status_Comanda = 'Finalizată'
+) AND ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM RecenziiProduse
+    WHERE Nota_Acordata > 3
+);
+
+
+--sir caractere:
+--Exemplu de concatenare a numelui și prenumelui utilizatorilor:
+SELECT Nume || ' ' || Prenume AS Nume_Complet
+FROM Utilizatori;
+
+
+--Exemplu de extragere a primei litere din numele produselor:
+SELECT Nume_Produs, SUBSTRING(Nume_Produs FROM 1 FOR 1) AS Prima_Litera
+FROM InformatiiProduse;
+
+
+--calendar:
+--Exemplu de adăugare a 7 zile la data livrării comenzilor:
+SELECT ID_Comanda, Data_Ora_Livrarii, Data_Ora_Livrarii + INTERVAL '7 days' AS Noua_Data_Livrare
+FROM Comenzi;
+
+
+--Calcularea zilei săptămânii în care a fost înregistrată fiecare recenzie:
+--Această interogare utilizează funcția EXTRACT(DOW FROM Data_Inregistrare), care extrage ziua săptămânii (0 pentru duminică, 1 pentru luni, etc.) din data de înregistrare a recenziilor. Rezultatul este afișat în coloana "Zi_Saptamana".
+SELECT ID_Comanda, Data_Ora_Livrarii, 
+       EXTRACT(DOW FROM Data_Ora_Livrarii) AS Zi_Saptamana
+FROM Comenzi;
+
+
+
+--CASE:
+--Exemplu de utilizare a expresiei CASE pentru a evalua starea comenzilor:
+SELECT ID_Comanda, Status_Comanda,
+       CASE
+           WHEN Status_Comanda = 'Finalizată' THEN 'Comanda Finalizata'
+           WHEN Status_Comanda = 'In procesare' THEN 'Comanda In Procesare'
+           WHEN Status_Comanda = 'Livrată' THEN 'Comanda a fost livrată'
+		   ELSE 'Status necunoscut'
+       END AS Descriere_Status
+FROM Comenzi;
+
+
+--Exemplu de utilizare a expresiei CASE pentru a clasifica produsele în funcție de stoc:
+SELECT Nume_Produs, Stoc_Disponibil,
+       CASE
+           WHEN Stoc_Disponibil > 50 THEN 'Stoc Suficient'
+           WHEN Stoc_Disponibil > 0 THEN 'Stoc Limitat'
+           ELSE 'Stoc Epuizat'
+       END AS Stare_Stoc
+FROM InformatiiProduse;
+
+
+
+
+--VEDERI:
+--View pentru Lista Comenzilor:
+CREATE VIEW ListaComenzi AS
+SELECT Comenzi.ID_Comanda, Utilizatori.Nume, Utilizatori.Prenume, Comenzi.Status_Comanda
+FROM Comenzi
+JOIN Utilizatori ON Comenzi.ID_Utilizator = Utilizatori.ID_Utilizator;
+
+SELECT * FROM ListaComenzi;--PERMISA
+
+UPDATE ListaComenzi
+SET Status_Comanda = 'Finalizată'--NEPERMISA
+WHERE ID_Comanda = 1;
+
+
+--View pentru Produsele în Stoc:
+CREATE VIEW ProduseInStoc AS
+SELECT Nume_Produs, Stoc_Disponibil
+FROM InformatiiProduse
+WHERE Stoc_Disponibil > 0;
+
+UPDATE ProduseInStoc
+SET Stoc_Disponibil = Stoc_Disponibil - 1 --PERMISA
+WHERE Nume_Produs = 'Laptop';
+
+
+INSERT INTO ProduseInStoc (Nume_Produs, Stoc_Disponibil) --NEPERMISA
+VALUES ('Cameră Foto', 5);
+
+--View pentru Detaliile Recenziilor:
+CREATE VIEW DetaliiRecenziiComenzi AS
+SELECT
+    DC.ID_DetaliiComanda,
+    C.ID_Comanda,
+    C.ID_Utilizator,
+    U.Nume AS Nume_Utilizator,
+    U.Prenume AS Prenume_Utilizator,
+    C.Status_Comanda,
+    C.Data_Ora_Livrarii,
+    C.Total_Comanda,
+    RP.ID_Recenzie,
+    RP.Comentariu,
+    RP.Nota_Acordata
+FROM
+    DetaliiComanda DC
+JOIN Comenzi C ON DC.ID_Comanda = C.ID_Comanda
+JOIN RecenziiProduse RP ON C.ID_Utilizator = RP.ID_Utilizator
+JOIN Utilizatori U ON C.ID_Utilizator = U.ID_Utilizator;
+
+
+-- Exemplu de interogare pe vedere
+SELECT * FROM DetaliiRecenziiComenzi;
+
+
+-- Exemplu de încercare de actualizare a vederii (nepermis)
+UPDATE DetaliiRecenziiComenzi
+SET Status_Comanda = 'Finalizată'
+WHERE ID_Comanda = 1;
+
+-- Exemplu de încercare de inserare în vedere (nepermis)
+INSERT INTO DetaliiRecenziiComenzi (ID_Comanda, Status_Comanda)
+VALUES (6, 'Noua Comanda');
+
+-- Exemplu de încercare de ștergere din vedere (nepermis)
+DELETE FROM DetaliiRecenziiComenzi
+WHERE ID_Comanda = 2;
+
+
+--INDEX:
+-- Crearea unui index compus pe coloanele utilizate în condițiile de căutare
+CREATE INDEX idx_AdreseLivrare_Comenzi
+ON AdreseLivrare (Oras)
+INCLUDE (Cod_Postal); -- Include Cod_Postal în index, dar nu este parte din cheia de căutare
+--Acest index, numit idx_AdreseLivrare_Comenzi, acoperă coloana Oras din tabela AdreseLivrare și include coloana Cod_Postal în index, dar nu este parte a cheii de căutare. Prin includerea coloanei Cod_Postal în index, putem îmbunătăți performanța pentru situațiile în care această coloană este inclusă în SELECT sau în condiții de filtrare, fără a o face o cheie de căutare strictă.
+
