@@ -1,0 +1,11 @@
+Exemplu de adăugare a 7 zile la data livrării comenzilor:
+SELECT ID_Comanda, Data_Ora_Livrarii, Data_Ora_Livrarii + INTERVAL '7 days' AS Noua_Data_Livrare
+FROM Comenzi;
+
+
+Calcularea zilei săptămânii în care a fost înregistrată fiecare recenzie:
+Această interogare utilizează funcția EXTRACT(DOW FROM Data_Inregistrare), care extrage ziua săptămânii (0 pentru duminică, 1 pentru luni, etc.) din data de înregistrare a recenziilor. Rezultatul este afișat în coloana "Zi_Saptamana".
+SELECT ID_Comanda, Data_Ora_Livrarii, 
+       EXTRACT(DOW FROM Data_Ora_Livrarii) AS Zi_Saptamana
+FROM Comenzi;
+
