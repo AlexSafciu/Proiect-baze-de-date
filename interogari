@@ -1,0 +1,156 @@
+Inner Join - Obține informații despre produsele dintr-o comandă:
+SELECT DetaliiComanda.ID_Comanda, DetaliiComanda.Cantitate, InformatiiProduse.Nume_Produs
+FROM DetaliiComanda
+INNER JOIN InformatiiProduse ON DetaliiComanda.ID_Comanda = InformatiiProduse.ID_Produs;
+
+
+Left Outer Join - Afișează toate adresele de livrare și utilizatorii asociați (chiar și cei fără adrese de livrare):
+SELECT Utilizatori.Nume, Utilizatori.Prenume, AdreseLivrare.Oras
+FROM Utilizatori
+LEFT OUTER JOIN UtilizatoriAdresa ON Utilizatori.ID_Utilizator = UtilizatoriAdresa.ID_Utilizator
+LEFT OUTER JOIN AdreseLivrare ON UtilizatoriAdresa.ID_AdresaLivrare = AdreseLivrare.ID_AdresaLivrare;
+
+
+Inner Join - Obține recenziile și numele utilizatorilor care le-au scris, împreună cu informații despre produse:
+SELECT RecenziiProduse.Comentariu, RecenziiProduse.Nota_Acordata, Utilizatori.Nume, Utilizatori.Prenume, InformatiiProduse.Nume_Produs
+FROM RecenziiProduse
+INNER JOIN Utilizatori ON RecenziiProduse.ID_Utilizator = Utilizatori.ID_Utilizator
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs;
+
+
+Right Outer Join - Afișează toate categoriile de produse și produsele asociate (chiar și cele fără categorii), împreună cu informații despre produse:
+SELECT CategoriiProduse.Nume_Categorie, InformatiiProduse.Nume_Produs
+FROM CategoriiProduse
+RIGHT OUTER JOIN InformatiiProduse ON CategoriiProduse.ID_Produs = InformatiiProduse.ID_Produs;
+
+Afișează suma totală a comenzilor pentru fiecare utilizator:
+(am adaugat inca o comanda la id utiliz 4)
+SELECT RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs, AVG(RecenziiProduse.Nota_Acordata) AS MedieNota
+FROM RecenziiProduse
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs
+GROUP BY RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs;
+
+Afișează media notelor acordate în recenzii pentru fiecare produs:
+SELECT RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs, AVG(RecenziiProduse.Nota_Acordata) AS MedieNota
+FROM RecenziiProduse
+INNER JOIN InformatiiProduse ON RecenziiProduse.ID_Produs = InformatiiProduse.ID_Produs
+GROUP BY RecenziiProduse.ID_Produs, InformatiiProduse.Nume_Produs;
+
+
+
+Afișează cantitatea totală de produse comandate pentru fiecare categorie:
+SELECT CategoriiProduse.Nume_Categorie, SUM(DetaliiComanda.Cantitate) AS CantitateTotala
+FROM CategoriiProduse
+INNER JOIN Produse ON CategoriiProduse.ID_Produs = Produse.ID_Produs
+INNER JOIN DetaliiComanda ON Produse.ID_Comanda = DetaliiComanda.ID_Comanda
+GROUP BY CategoriiProduse.Nume_Categorie;
+
+CORELATE:
+Exemplu cu IN:
+Această subinterogare verifică utilizatorii care au comenzi finalizate.
+SELECT Nume, Prenume
+FROM Utilizatori
+WHERE ID_Utilizator IN (SELECT ID_Utilizator FROM Comenzi WHERE Status_Comanda = 'Finalizată');
+
+
+--Exemplu cu ANY:
+--Această subinterogare returnează categoriile produselor cu un preț mai mare de 1000.
+--Această interogare returnează numele și prenumele utilizatorilor care au plasat comenzi cu o cantitate mai mare de 2 pentru orice produs, implicând astfel cele trei tabele menționate.
+SELECT Nume, Prenume
+FROM Utilizatori
+WHERE ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM Comenzi
+    WHERE ID_Comanda IN (
+        SELECT ID_Comanda
+        FROM DetaliiComanda
+        WHERE Cantitate > 2
+    )
+);
+
+--Eemplu cu EXISTS:
+--Această interogare returnează numele și prenumele utilizatorilor care au comenzi cu o cantitate mai mare de 2 pentru oricare dintre produsele comandate, implicând cele trei tabele menționate.
+SELECT Nume, Prenume
+FROM Utilizatori U
+WHERE EXISTS (
+    SELECT 1
+    FROM Comenzi C
+    WHERE EXISTS (
+        SELECT 1
+        FROM DetaliiComanda DC
+        WHERE DC.ID_Comanda = C.ID_Comanda
+        AND DC.Cantitate > 2
+    )
+    AND C.ID_Utilizator = U.ID_Utilizator
+);
+
+
+--Exemplu cu ALL:
+--Această interogare verifică dacă utilizatorul are toate comenzile finalizate cu un total mai mare de 200 și, în același timp, are toate detaliile comenzilor cu o cantitate mai mare de 1.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM Comenzi
+    WHERE Status_Comanda = 'Finalizată' AND Total_Comanda > 200
+          AND ID_Utilizator = ALL (
+              SELECT ID_Utilizator
+              FROM DetaliiComanda
+              WHERE Cantitate > 1
+          )
+);
+
+
+--NECORELARE:
+--IN:
+--Se selectează numele utilizatorilor care au plasat comenzi și au lăsat recenzii la produse.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM Comenzi
+) AND ID_Utilizator IN (
+    SELECT DISTINCT ID_Utilizator
+    FROM RecenziiProduse
+);
+
+
+
+--ANY:
+--Se selectează numele categoriilor de produse care au cel puțin un produs cu un stoc disponibil mai mare de 10 unități.
+SELECT Nume_Categorie
+FROM CategoriiProduse
+WHERE ID_Produs = ANY (
+    SELECT ID_Produs
+    FROM InformatiiProduse
+    WHERE Stoc_Disponibil > 10
+);
+
+
+--EXISTS:
+--e selectează numele produselor care fac parte din categoria "Electronice" și nu au fost comandate în cantități mai mari de 5.
+SELECT Nume_Produs
+FROM InformatiiProduse
+WHERE EXISTS (
+    SELECT 1
+    FROM CategoriiProduse
+    WHERE Descriere_Categorie LIKE 'Electronice%'
+) AND NOT EXISTS (
+    SELECT 1
+    FROM DetaliiComanda
+    WHERE ID_Produs = InformatiiProduse.ID_Produs AND Cantitate > 5
+);
+
+ALL:
+Se selectează numele utilizatorilor care au plasat toate comenzile finalizate și au dat note mai mari de 3 în toate recenziile lor.
+SELECT Nume
+FROM Utilizatori
+WHERE ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM Comenzi
+    WHERE Status_Comanda = 'Finalizată'
+) AND ID_Utilizator = ALL (
+    SELECT ID_Utilizator
+    FROM RecenziiProduse
+    WHERE Nota_Acordata > 3
+);
