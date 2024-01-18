@@ -1,0 +1,26 @@
+UPDATE Utilizatori
+SET Prenume = 'Radu'
+WHERE ID_Utilizator = 1;
+-----------------------------------------------------------------------------------------------------------
+UPDATE Produse
+SET Stoc_Disponibil = Stoc_Disponibil + 10
+WHERE ID_Produs = 2;
+------------------------------------------------------------------------------------------------------------
+DELETE FROM RecenziiProduse
+WHERE ID_Recenzie = 3;
+-------------------------------------------------------------------------------------------------------------
+Actualizare - Actualizarea statusului comenzii la 'Finalizată' pentru un utilizator anume:
+UPDATE Comenzi
+SET Status_Comanda = 'Finalizată'
+WHERE ID_Utilizator = (SELECT ID_Utilizator FROM Utilizatori WHERE Nume = 'Safciu' AND Prenume = 'Radu');
+
+-----------------------------------------------------------------------------------------------------------------
+Actualizare - Actualizarea prețului produselor cu o anumită categorie:
+UPDATE Produse
+SET Pret = Pret * 1.1
+WHERE ID_Produs IN (SELECT ID_Produs FROM CategoriiProduse WHERE Nume_Categorie = 'Laptopuri');
+
+----------------------------------------------------------------------------------------------------------------
+Ștergere - Ștergerea tuturor recenziilor asociate produselor cu stoc disponibil mai mic de 49:
+DELETE FROM RecenziiProduse
+WHERE ID_Produs IN (SELECT ID_Produs FROM Produse WHERE Stoc_Disponibil < 49);
