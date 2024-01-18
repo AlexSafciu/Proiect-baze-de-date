@@ -1,0 +1,7 @@
+-- Crearea unui index compus pe coloanele utilizate în condițiile de căutare
+CREATE INDEX idx_AdreseLivrare_Comenzi
+ON AdreseLivrare (Oras)
+INCLUDE (Cod_Postal); -- Include Cod_Postal în index, dar nu este parte din cheia de căutare
+Acest index, numit idx_AdreseLivrare_Comenzi, acoperă coloana Oras din tabela AdreseLivrare și include coloana Cod_Postal în index, dar nu este parte a cheii de căutare. 
+Prin includerea coloanei Cod_Postal în index, putem îmbunătăți performanța pentru situațiile în care această coloană este inclusă în SELECT sau în condiții de filtrare, fără a o face o cheie de căutare strictă.
+
