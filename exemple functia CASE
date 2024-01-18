@@ -1,0 +1,19 @@
+Exemplu de utilizare a expresiei CASE pentru a evalua starea comenzilor:
+SELECT ID_Comanda, Status_Comanda,
+       CASE
+           WHEN Status_Comanda = 'Finalizată' THEN 'Comanda Finalizata'
+           WHEN Status_Comanda = 'In procesare' THEN 'Comanda In Procesare'
+           WHEN Status_Comanda = 'Livrată' THEN 'Comanda a fost livrată'
+		   ELSE 'Status necunoscut'
+       END AS Descriere_Status
+FROM Comenzi;
+
+
+Exemplu de utilizare a expresiei CASE pentru a clasifica produsele în funcție de stoc:
+SELECT Nume_Produs, Stoc_Disponibil,
+       CASE
+           WHEN Stoc_Disponibil > 50 THEN 'Stoc Suficient'
+           WHEN Stoc_Disponibil > 0 THEN 'Stoc Limitat'
+           ELSE 'Stoc Epuizat'
+       END AS Stare_Stoc
+FROM InformatiiProduse;
